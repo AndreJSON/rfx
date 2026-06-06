@@ -22,7 +22,7 @@
 .recipe-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
 }
 
 .empty-state {
@@ -34,7 +34,8 @@
 
 .recipe-card {
   border-radius: 8px;
-  padding: 14px 16px;
+  padding: 6px 12px;
+  gap: 1px;
 }
 
 .recipe-title {
