@@ -1,257 +1,3 @@
-<script setup>
-import { ref, computed, watch } from 'vue';
-import {
-  DialogRoot,
-  DialogPortal,
-  DialogOverlay,
-  DialogContent,
-  DialogTitle,
-} from 'radix-vue';
-import { useRecipeStore } from '../stores/recipeStore.js';
-
-const props = defineProps({
-  open: Boolean,
-  recipeId: { type: String, default: null },
-});
-
-const emit = defineEmits(['close']);
-
-const store = useRecipeStore();
-
-// --- State ---
-const mode = ref('view'); // 'view' | 'edit' | 'create'
-const recipe = ref(null); // full recipe: { id, title, tags, body, imageName }
-const isLoading = ref(false);
-const error = ref(null);
-
-// Edit form fields
-const editTitle = ref('');
-const editBody = ref('');
-const editTags = ref([]);
-const tagInput = ref('');
-
-// Image handling
-const imageTimestamp = ref(Date.now()); // cache-busting for API images
-const pendingImageFile = ref(null);     // File selected in create mode (uploaded on save)
-const pendingImagePreviewUrl = ref(null); // blob URL for create-mode preview
-
-// --- Computed ---
-
-/** The current recipe ID — uses fetched recipe.id after creation, falls back to prop */
-const currentId = computed(() => recipe.value?.id ?? props.recipeId);
-
-/** Image URL to display (either blob preview or API URL) */
-const displayImageUrl = computed(() => {
-  if (pendingImagePreviewUrl.value) return pendingImagePreviewUrl.value;
-  if (!recipe.value?.imageName) return null;
-  if (!currentId.value) return null;
-  return `/api/recipes/${currentId.value}/image?t=${imageTimestamp.value}`;
-});
-
-// --- Watchers ---
-
-watch(() => props.open, async (open) => {
-  if (!open) return;
-  error.value = null;
-  clearPendingImage();
-  if (props.recipeId === null) {
-    mode.value = 'create';
-    recipe.value = null;
-    resetEditForm();
-  } else {
-    mode.value = 'view';
-    await loadRecipe(props.recipeId);
-  }
-});
-
-// --- Methods ---
-
-async function loadRecipe(id) {
-  isLoading.value = true;
-  error.value = null;
-  try {
-    recipe.value = await store.fetchRecipe(id);
-    imageTimestamp.value = Date.now();
-  } catch {
-    error.value = 'Failed to load recipe.';
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-function resetEditForm() {
-  editTitle.value = '';
-  editBody.value = '';
-  editTags.value = [];
-  tagInput.value = '';
-}
-
-function startEdit() {
-  editTitle.value = recipe.value.title;
-  editBody.value = recipe.value.body;
-  editTags.value = [...recipe.value.tags];
-  tagInput.value = '';
-  mode.value = 'edit';
-}
-
-function clearPendingImage() {
-  if (pendingImagePreviewUrl.value) {
-    URL.revokeObjectURL(pendingImagePreviewUrl.value);
-    pendingImagePreviewUrl.value = null;
-  }
-  pendingImageFile.value = null;
-}
-
-// --- Tag input ---
-
-function handleTagKeydown(e) {
-  if (e.key === 'Enter' || e.key === ',') {
-    e.preventDefault();
-    commitTag();
-  }
-}
-
-function handleTagInput(e) {
-  // Strip whitespace and enforce uppercase as user types
-  e.target.value = e.target.value.replace(/\s/g, '').toUpperCase();
-  tagInput.value = e.target.value;
-}
-
-function commitTag() {
-  const tag = tagInput.value.trim().toUpperCase();
-  if (tag && /^\S+$/.test(tag) && !editTags.value.includes(tag)) {
-    editTags.value.push(tag);
-  }
-  tagInput.value = '';
-}
-
-function removeTag(tag) {
-  editTags.value = editTags.value.filter(t => t !== tag);
-}
-
-// --- Title input ---
-
-function handleTitleKeydown(e) {
-  if (e.key === 'Enter') e.preventDefault();
-}
-
-function handleTitleInput(e) {
-  if (e.target.value.includes('\n')) {
-    e.target.value = e.target.value.replace(/\n/g, '');
-    editTitle.value = e.target.value;
-  }
-}
-
-// --- Image handling ---
-
-async function handleImageFileSelect(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  if (mode.value === 'create') {
-    // Store for upload on save; show preview via blob URL
-    clearPendingImage();
-    pendingImageFile.value = file;
-    pendingImagePreviewUrl.value = URL.createObjectURL(file);
-  } else {
-    // Edit mode: upload immediately
-    isLoading.value = true;
-    error.value = null;
-    try {
-      const result = await store.uploadImage(currentId.value, file);
-      recipe.value = { ...recipe.value, imageName: result.imageName };
-      imageTimestamp.value = Date.now();
-    } catch (err) {
-      error.value = err.message || 'Failed to upload image.';
-    } finally {
-      isLoading.value = false;
-      e.target.value = '';
-    }
-  }
-}
-
-async function handleImageRemove() {
-  if (mode.value === 'create') {
-    clearPendingImage();
-    return;
-  }
-  // Edit mode: remove immediately
-  isLoading.value = true;
-  error.value = null;
-  try {
-    await store.removeImage(currentId.value);
-    recipe.value = { ...recipe.value, imageName: null };
-    imageTimestamp.value = Date.now();
-  } catch (err) {
-    error.value = err.message || 'Failed to remove image.';
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-// --- Save / Cancel / Delete ---
-
-async function handleSave() {
-  // Flush any pending tag in the input
-  commitTag();
-  const title = editTitle.value.trim();
-  if (!title) {
-    error.value = 'Title is required.';
-    return;
-  }
-  error.value = null;
-  isLoading.value = true;
-  try {
-    const data = { title, body: editBody.value, tags: editTags.value };
-    if (mode.value === 'create') {
-      const created = await store.createRecipe(data);
-      recipe.value = { ...created };
-      // Upload pending image if any
-      if (pendingImageFile.value) {
-        try {
-          const result = await store.uploadImage(created.id, pendingImageFile.value);
-          recipe.value = { ...recipe.value, imageName: result.imageName };
-        } catch {
-          error.value = 'Recipe saved but image upload failed.';
-        }
-        clearPendingImage();
-      }
-      imageTimestamp.value = Date.now();
-    } else {
-      const updated = await store.updateRecipe(currentId.value, data);
-      recipe.value = { ...updated, imageName: recipe.value.imageName };
-    }
-    mode.value = 'view';
-  } catch (err) {
-    error.value = err.message || 'Failed to save recipe.';
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-function handleCancel() {
-  error.value = null;
-  if (mode.value === 'create') {
-    clearPendingImage();
-    emit('close');
-  } else {
-    mode.value = 'view';
-  }
-}
-
-async function handleDelete() {
-  if (!confirm('Delete this recipe? This cannot be undone.')) return;
-  isLoading.value = true;
-  try {
-    await store.deleteRecipe(currentId.value);
-    emit('close');
-  } catch {
-    error.value = 'Failed to delete recipe.';
-    isLoading.value = false;
-  }
-}
-</script>
-
 <template>
   <DialogRoot :open="open" @update:open="(v) => !v && emit('close')">
     <DialogPortal>
@@ -661,3 +407,257 @@ async function handleDelete() {
   font-size: 13px;
 }
 </style>
+
+<script setup>
+import { ref, computed, watch } from 'vue';
+import {
+  DialogRoot,
+  DialogPortal,
+  DialogOverlay,
+  DialogContent,
+  DialogTitle,
+} from 'radix-vue';
+import { useRecipeStore } from '../stores/recipeStore.js';
+
+const props = defineProps({
+  open: Boolean,
+  recipeId: { type: String, default: null },
+});
+
+const emit = defineEmits(['close']);
+
+const store = useRecipeStore();
+
+// --- State ---
+const mode = ref('view'); // 'view' | 'edit' | 'create'
+const recipe = ref(null); // full recipe: { id, title, tags, body, imageName }
+const isLoading = ref(false);
+const error = ref(null);
+
+// Edit form fields
+const editTitle = ref('');
+const editBody = ref('');
+const editTags = ref([]);
+const tagInput = ref('');
+
+// Image handling
+const imageTimestamp = ref(Date.now()); // cache-busting for API images
+const pendingImageFile = ref(null);     // File selected in create mode (uploaded on save)
+const pendingImagePreviewUrl = ref(null); // blob URL for create-mode preview
+
+// --- Computed ---
+
+/** The current recipe ID — uses fetched recipe.id after creation, falls back to prop */
+const currentId = computed(() => recipe.value?.id ?? props.recipeId);
+
+/** Image URL to display (either blob preview or API URL) */
+const displayImageUrl = computed(() => {
+  if (pendingImagePreviewUrl.value) return pendingImagePreviewUrl.value;
+  if (!recipe.value?.imageName) return null;
+  if (!currentId.value) return null;
+  return `/api/recipes/${currentId.value}/image?t=${imageTimestamp.value}`;
+});
+
+// --- Watchers ---
+
+watch(() => props.open, async (open) => {
+  if (!open) return;
+  error.value = null;
+  clearPendingImage();
+  if (props.recipeId === null) {
+    mode.value = 'create';
+    recipe.value = null;
+    resetEditForm();
+  } else {
+    mode.value = 'view';
+    await loadRecipe(props.recipeId);
+  }
+});
+
+// --- Methods ---
+
+async function loadRecipe(id) {
+  isLoading.value = true;
+  error.value = null;
+  try {
+    recipe.value = await store.fetchRecipe(id);
+    imageTimestamp.value = Date.now();
+  } catch {
+    error.value = 'Failed to load recipe.';
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+function resetEditForm() {
+  editTitle.value = '';
+  editBody.value = '';
+  editTags.value = [];
+  tagInput.value = '';
+}
+
+function startEdit() {
+  editTitle.value = recipe.value.title;
+  editBody.value = recipe.value.body;
+  editTags.value = [...recipe.value.tags];
+  tagInput.value = '';
+  mode.value = 'edit';
+}
+
+function clearPendingImage() {
+  if (pendingImagePreviewUrl.value) {
+    URL.revokeObjectURL(pendingImagePreviewUrl.value);
+    pendingImagePreviewUrl.value = null;
+  }
+  pendingImageFile.value = null;
+}
+
+// --- Tag input ---
+
+function handleTagKeydown(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    commitTag();
+  }
+}
+
+function handleTagInput(e) {
+  // Strip whitespace and enforce uppercase as user types
+  e.target.value = e.target.value.replace(/\s/g, '').toUpperCase();
+  tagInput.value = e.target.value;
+}
+
+function commitTag() {
+  const tag = tagInput.value.trim().toUpperCase();
+  if (tag && /^\S+$/.test(tag) && !editTags.value.includes(tag)) {
+    editTags.value.push(tag);
+  }
+  tagInput.value = '';
+}
+
+function removeTag(tag) {
+  editTags.value = editTags.value.filter(t => t !== tag);
+}
+
+// --- Title input ---
+
+function handleTitleKeydown(e) {
+  if (e.key === 'Enter') e.preventDefault();
+}
+
+function handleTitleInput(e) {
+  if (e.target.value.includes('\n')) {
+    e.target.value = e.target.value.replace(/\n/g, '');
+    editTitle.value = e.target.value;
+  }
+}
+
+// --- Image handling ---
+
+async function handleImageFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (mode.value === 'create') {
+    // Store for upload on save; show preview via blob URL
+    clearPendingImage();
+    pendingImageFile.value = file;
+    pendingImagePreviewUrl.value = URL.createObjectURL(file);
+  } else {
+    // Edit mode: upload immediately
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const result = await store.uploadImage(currentId.value, file);
+      recipe.value = { ...recipe.value, imageName: result.imageName };
+      imageTimestamp.value = Date.now();
+    } catch (err) {
+      error.value = err.message || 'Failed to upload image.';
+    } finally {
+      isLoading.value = false;
+      e.target.value = '';
+    }
+  }
+}
+
+async function handleImageRemove() {
+  if (mode.value === 'create') {
+    clearPendingImage();
+    return;
+  }
+  // Edit mode: remove immediately
+  isLoading.value = true;
+  error.value = null;
+  try {
+    await store.removeImage(currentId.value);
+    recipe.value = { ...recipe.value, imageName: null };
+    imageTimestamp.value = Date.now();
+  } catch (err) {
+    error.value = err.message || 'Failed to remove image.';
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// --- Save / Cancel / Delete ---
+
+async function handleSave() {
+  // Flush any pending tag in the input
+  commitTag();
+  const title = editTitle.value.trim();
+  if (!title) {
+    error.value = 'Title is required.';
+    return;
+  }
+  error.value = null;
+  isLoading.value = true;
+  try {
+    const data = { title, body: editBody.value, tags: editTags.value };
+    if (mode.value === 'create') {
+      const created = await store.createRecipe(data);
+      recipe.value = { ...created };
+      // Upload pending image if any
+      if (pendingImageFile.value) {
+        try {
+          const result = await store.uploadImage(created.id, pendingImageFile.value);
+          recipe.value = { ...recipe.value, imageName: result.imageName };
+        } catch {
+          error.value = 'Recipe saved but image upload failed.';
+        }
+        clearPendingImage();
+      }
+      imageTimestamp.value = Date.now();
+    } else {
+      const updated = await store.updateRecipe(currentId.value, data);
+      recipe.value = { ...updated, imageName: recipe.value.imageName };
+    }
+    mode.value = 'view';
+  } catch (err) {
+    error.value = err.message || 'Failed to save recipe.';
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+function handleCancel() {
+  error.value = null;
+  if (mode.value === 'create') {
+    clearPendingImage();
+    emit('close');
+  } else {
+    mode.value = 'view';
+  }
+}
+
+async function handleDelete() {
+  if (!confirm('Delete this recipe? This cannot be undone.')) return;
+  isLoading.value = true;
+  try {
+    await store.deleteRecipe(currentId.value);
+    emit('close');
+  } catch {
+    error.value = 'Failed to delete recipe.';
+    isLoading.value = false;
+  }
+}
+</script>

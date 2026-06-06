@@ -1,32 +1,3 @@
-<script setup>
-import { onMounted, ref } from 'vue';
-import { useRecipeStore } from './stores/recipeStore.js';
-import RecipeList from './components/RecipeList.vue';
-import RecipeModal from './components/RecipeModal.vue';
-
-const store = useRecipeStore();
-const modalOpen = ref(false);
-const selectedRecipeId = ref(null);
-
-onMounted(() => {
-  store.fetchRecipes();
-});
-
-function openCreate() {
-  selectedRecipeId.value = null;
-  modalOpen.value = true;
-}
-
-function openRecipe(id) {
-  selectedRecipeId.value = id;
-  modalOpen.value = true;
-}
-
-function closeModal() {
-  modalOpen.value = false;
-}
-</script>
-
 <template>
   <div class="app">
     <header class="toolbar">
@@ -131,3 +102,32 @@ body {
   width: 100%;
 }
 </style>
+
+<script setup>
+import { onMounted, ref } from 'vue';
+import { useRecipeStore } from './stores/recipeStore.js';
+import RecipeList from './components/RecipeList.vue';
+import RecipeModal from './components/RecipeModal.vue';
+
+const store = useRecipeStore();
+const modalOpen = ref(false);
+const selectedRecipeId = ref(null);
+
+onMounted(() => {
+  store.fetchRecipes();
+});
+
+function openCreate() {
+  selectedRecipeId.value = null;
+  modalOpen.value = true;
+}
+
+function openRecipe(id) {
+  selectedRecipeId.value = id;
+  modalOpen.value = true;
+}
+
+function closeModal() {
+  modalOpen.value = false;
+}
+</script>

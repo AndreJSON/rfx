@@ -1,20 +1,3 @@
-<script setup>
-import { computed } from 'vue';
-import { useRecipeStore } from '../stores/recipeStore.js';
-
-const emit = defineEmits(['open-recipe']);
-const store = useRecipeStore();
-
-const filtered = computed(() => {
-  const q = store.searchQuery.toLowerCase().trim();
-  if (!q) return store.recipes;
-  return store.recipes.filter(r =>
-    r.title.toLowerCase().includes(q) ||
-    r.tags.some(t => t.toLowerCase().includes(q))
-  );
-});
-</script>
-
 <template>
   <div class="recipe-list">
     <div v-if="filtered.length === 0" class="empty-state">
@@ -77,3 +60,20 @@ const filtered = computed(() => {
   color: #777;
 }
 </style>
+
+<script setup>
+import { computed } from 'vue';
+import { useRecipeStore } from '../stores/recipeStore.js';
+
+const emit = defineEmits(['open-recipe']);
+const store = useRecipeStore();
+
+const filtered = computed(() => {
+  const q = store.searchQuery.toLowerCase().trim();
+  if (!q) return store.recipes;
+  return store.recipes.filter(r =>
+    r.title.toLowerCase().includes(q) ||
+    r.tags.some(t => t.toLowerCase().includes(q))
+  );
+});
+</script>
