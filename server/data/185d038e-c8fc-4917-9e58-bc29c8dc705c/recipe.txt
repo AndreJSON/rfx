@@ -1,0 +1,8 @@
+TITLE: Test recipe
+CREATED: 2026-06-06T19:45:16.151Z
+UPDATED: 2026-06-06T19:45:16.151Z
+DELETED: 
+TAGS: tag1,tag2
+BODY: Recipe body
+
+And such.
