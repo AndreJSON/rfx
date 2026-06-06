@@ -117,7 +117,6 @@
               <div v-if="error" class="error-msg">{{ error }}</div>
 
               <div class="modal-footer">
-                <BaseButton variant="secondary" @click="handleCancel">Cancel</BaseButton>
                 <BaseButton variant="primary" :disabled="isLoading" @click="handleSave">
                   Save
                 </BaseButton>
