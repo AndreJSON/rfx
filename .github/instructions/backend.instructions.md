@@ -46,7 +46,7 @@ See [image.instructions.md](image.instructions.md) for full image handling rules
 
 | Method | Path | Request | Response |
 |--------|------|---------|----------|
-| `GET` | `/api/recipes` | — | `200` `[{ id, title, tags }]` sorted by `created` ascending |
+| `GET` | `/api/recipes` | — | `200` `[{ id, title, tags }]` sorted by `created` ascending. body and imageUrl are omitted from this response. |
 | `GET` | `/api/recipes/:id` | — | `200` `{ id, title, tags, body, imageUrl }` |
 | `POST` | `/api/recipes` | JSON `{ title, tags?, body? }` | `201` `{ id, title, tags, body, imageUrl }` (`imageUrl` is `null` on creation) |
 | `PUT` | `/api/recipes/:id` | JSON `{ title, tags, body }` — all fields required; all fields are always overwritten; send `""` / `[]` to clear optional fields | `200` `{ id, title, tags, body, imageUrl }` |
