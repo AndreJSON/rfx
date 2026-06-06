@@ -9,9 +9,9 @@ description: "Use when working with recipe data, the recipe file format, disk pe
 | Field   | Type     | Required | Constraints |
 |---------|----------|----------|-------------|
 | `id`    | `string` | Yes      | UUID v4; immutable once created |
-| `title` | `string` | Yes      | Non-empty; no newline characters |
-| `tags`  | `string[]` | No     | Each tag contains no whitespace; stored as comma-separated in file |
-| `body`  | `string` | No       | Free-form multi-line text |
+| `title` | `string` | Yes      | Non-empty; no newline characters; plain text only |
+| `tags`  | `string[]` | No     | Each tag contains no whitespace; stored as comma-separated in file; plain text only |
+| `body`  | `string` | No       | Free-form multi-line plain text; no HTML or other markup |
 | `image` | `string \| null` | No | Relative filename (e.g. `image.jpg`); at most one image per recipe |
 
 ## Disk Layout
@@ -29,30 +29,27 @@ server/data/
 
 ## `recipe.txt` Format
 
-Plain text file with labelled sections separated by blank lines:
+Plain text file with exactly three sections in a fixed order, no blank lines between them:
 
 ```
 TITLE: Banana Bread
-
 TAGS: baking,sweet,easy
-
-BODY:
-Mix flour and sugar.
+BODY: Mix flour and sugar.
 Mash the bananas.
 Bake at 180°C for 50 minutes.
 ```
 
 Parsing rules:
-- `TITLE:` — single line after the colon (trimmed).
-- `TAGS:` — single line, comma-separated, no surrounding whitespace per tag. Omit the line entirely if there are no tags.
-- `BODY:` — everything after the `BODY:` line until end of file. Omit the section entirely if body is empty.
-- Sections may appear in any order but `TITLE` must be present.
+- Line 1 is always `TITLE:` — value is the rest of the line (trimmed).
+- Line 2 is always `TAGS:` — value is the rest of the line, comma-separated. Empty if no tags.
+- Line 3 onward is always `BODY:` — the first line's value starts after the colon; subsequent lines until EOF are continuation lines. Empty if no body.
+- All three sections are always written, even when `TAGS` or `BODY` are empty (e.g. `TAGS: ` and `BODY: `).
 
 ## Validation Rules
 
-- `title`: required, `string`, strip leading/trailing whitespace, reject if empty or contains `\n`.
-- `tags`: each element must match `/^\S+$/` (no whitespace). Duplicates should be deduplicated.
-- `body`: optional free-form string; newlines are preserved.
+- `title`: required, `string`, plain text only, strip leading/trailing whitespace, reject if empty or contains `\n`.
+- `tags`: each element must match `/^\S+$/` (no whitespace), plain text only. Duplicates should be deduplicated.
+- `body`: optional free-form plain text string; newlines are preserved; no HTML or other markup.
 - `image`: server accepts `multipart/form-data`; only one image per recipe; replaces any existing image on upload; deleted from disk on removal.
 
 ## API Contract (summary)
