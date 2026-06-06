@@ -2,13 +2,13 @@
 
 ## Overview
 
-A Node.js web server (port 8080) that serves a Vue 3 single-page frontend for listing, viewing, and editing recipes. Recipes are persisted to disk. The project is a monorepo with a `server/` directory for the backend and a `client/` directory for the frontend.
+A Node.js web server that serves a Vue 3 single-page frontend for listing, viewing, and editing recipes. Recipes are persisted to disk. The project is a monorepo with a `server/` directory for the backend and a `client/` directory for the frontend.
 
 ## Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Server | Node.js (Express or similar), port 8080 |
+| Server | Node.js (Express), port 8080 |
 | Frontend | Vue 3, Pinia (state), Radix UI (components) |
 | Persistence | File system — one folder per recipe |
 | Build | Vite (client), served as static files from the server |
@@ -32,14 +32,6 @@ A Node.js web server (port 8080) that serves a Vue 3 single-page frontend for li
 ## Data Model
 
 See `.github/instructions/data-model.instructions.md` for the full recipe schema and file format.
-
-## Key Constraints
-
-- Recipe title is **mandatory**; tags, body text, and image are optional.
-- A recipe may have **0 or 1 images**.
-- Title must not contain newlines.
-- Tags must not contain whitespace; multiple tags are comma-separated.
-- GUIDs are the canonical identifier — never reassigned or reused.
 
 ## Build & Dev
 

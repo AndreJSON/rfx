@@ -6,15 +6,16 @@ description: "Use when working with recipe data, the recipe file format, disk pe
 
 ## Recipe Object
 
-| Field   | Type     | Required | Constraints |
-|---------|----------|----------|-------------|
-| `id`      | `string` | Yes      | UUID v4; immutable once created |
-| `title`   | `string` | Yes      | Non-empty; no newline characters; plain text only |
-| `tags`    | `string[]` | No     | Each tag contains no whitespace; stored as comma-separated in file; plain text only |
-| `body`    | `string` | No       | Free-form multi-line plain text; no HTML or other markup |
-| `imageUrl`   | `string \| null` | No | Relative filename (e.g. `image.jpg`); at most one image per recipe. See [image.instructions.md](image.instructions.md) |
-| `created` | `string` | Yes      | ISO 8601 timestamp; set by backend on creation; never updated; **never sent to the frontend** |
-| `updated` | `string` | Yes      | ISO 8601 timestamp; set by backend on creation and on every PUT; **never sent to the frontend** |
+| Field   | Type     | Constraints |
+|---------|----------|-------------|
+| `id`      | `string` | UUID v4; immutable once created |
+| `title`   | `string` | Non-empty; no newline characters; plain text only |
+| `tags`    | `string[]` | Each tag contains no whitespace; stored as comma-separated in file; plain text only |
+| `body`    | `string` | Free-form multi-line plain text; no HTML or other markup |
+| `imageName`   | `string \| null` | Filename (e.g. `image.jpg`); at most one image per recipe. See [image.instructions.md](image.instructions.md) |
+| `created` | `string` | ISO 8601 timestamp; set by backend on creation; never updated; **never sent to the frontend** |
+| `updated` | `string` | ISO 8601 timestamp; set by backend on creation and on every PUT; **never sent to the frontend** |
+| `deleted` | `string \| null` | ISO 8601 timestamp; set by backend on creation and on every PUT; **never sent to the frontend** |
 
 ## Disk Layout
 
@@ -31,12 +32,13 @@ server/data/
 
 ## `recipe.txt` Format
 
-Plain text file with exactly three sections in a fixed order, no blank lines between them:
+Plain text file with exactly 6 sections in a fixed order, no blank lines between them:
 
 ```
 TITLE: Banana Bread
 CREATED: 2024-01-15T10:30:00.000Z
 UPDATED: 2024-03-22T14:05:00.000Z
+DELETED: 2024-05-22T14:05:00.000Z
 TAGS: baking,sweet,easy
 BODY: Mix flour and sugar.
 Mash the bananas.
@@ -47,8 +49,9 @@ Parsing rules:
 - Line 1 is always `TITLE:` — value is the rest of the line (trimmed).
 - Line 2 is always `CREATED:` — ISO 8601 timestamp set on creation; never changes.
 - Line 3 is always `UPDATED:` — ISO 8601 timestamp updated on every PUT.
-- Line 4 is always `TAGS:` — value is the rest of the line, comma-separated. Empty if no tags.
-- Line 5 onward is always `BODY:` — the first line's value starts after the colon; subsequent lines until EOF are continuation lines. Empty if no body.
+- Line 4 is always `DELETED:` — ISO 8601 timestamp if the recipe is marked as deleted. Empty if recipe is marked as deleted.
+- Line 5 is always `TAGS:` — value is the rest of the line, comma-separated. Empty if no tags.
+- Line 6 onward is always `BODY:` — the first line's value starts after the colon; subsequent lines until EOF are continuation lines. Empty if no body.
 - All five sections are always written.
 
 ## Validation Rules

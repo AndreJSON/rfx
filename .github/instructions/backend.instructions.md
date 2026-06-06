@@ -46,16 +46,14 @@ See [image.instructions.md](image.instructions.md) for full image handling rules
 
 | Method | Path | Request | Response |
 |--------|------|---------|----------|
-| `GET` | `/api/recipes` | — | `200` `[{ id, title, tags }]` sorted by `created` ascending. body and imageUrl are omitted from this response. |
-| `GET` | `/api/recipes/:id` | — | `200` `{ id, title, tags, body, imageUrl }` |
-| `POST` | `/api/recipes` | JSON `{ title, tags?, body? }` | `201` `{ id, title, tags, body, imageUrl }` (`imageUrl` is `null` on creation) |
-| `PUT` | `/api/recipes/:id` | JSON `{ title, tags, body }` — all fields required; all fields are always overwritten; send `""` / `[]` to clear optional fields | `200` `{ id, title, tags, body, imageUrl }` |
+| `GET` | `/api/recipes` | — | `200` `[{ id, title, tags }]` sorted by `created` ascending. body and imageName are omitted from this response. |
+| `GET` | `/api/recipes/:id` | — | `200` `{ id, title, tags, body, imageName }` |
+| `POST` | `/api/recipes` | JSON `{ title, tags?, body? }` | `201` `{ id, title, tags, body, imageName }` (`imageName` is `null` on creation) |
+| `PUT` | `/api/recipes/:id` | JSON `{ title, tags, body }` — all fields required; all fields are always overwritten; send `""` / `[]` to clear optional fields | `200` `{ id, title, tags, body, imageName }` |
 | `DELETE` | `/api/recipes/:id` | — | `204` |
-| `POST` | `/api/recipes/:id/image` | `multipart/form-data` field `image` | `200` `{ imageUrl }` |
+| `POST` | `/api/recipes/:id/image` | `multipart/form-data` field `image` | `200` `{ imageName }` |
 | `DELETE` | `/api/recipes/:id/image` | — | `204` |
 | `GET` | `/api/recipes/:id/image` | — | Image file stream |
-
-`imageUrl` is a relative path the client can use directly, e.g. `/api/recipes/{id}/image`. See [image.instructions.md](image.instructions.md) for full image endpoint details.
 
 ## Search
 
