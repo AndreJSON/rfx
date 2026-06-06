@@ -30,10 +30,11 @@ applyTo: "server/**"
 
 - Accept image uploads via `multipart/form-data` using `multer` (or equivalent).
 - Only the following MIME types are accepted: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/heic`, `image/heif`, `image/avif`. Reject any other type with `400 { "error": "Unsupported image type" }`.
-- Validate MIME type using the `mimetype` reported by multer (from the `Content-Type` of the file part).
-- Store uploaded image as `server/data/{uuid}/image.{originalExtension}`.
+- **Detect the MIME type from the file's magic bytes** (e.g. using the `file-type` package) — do **not** trust the client-reported `Content-Type` or the original filename extension.
+- Derive the file extension from the detected MIME type (e.g. `image/jpeg` → `.jpg`). Use a fixed mapping; do not rely on the original filename.
+- Store uploaded image as `server/data/{uuid}/image.{detectedExtension}`.
 - Only one image per recipe — any existing image file is deleted before saving the new one.
-- Serve images via `GET /api/recipes/:id/image` by reading and streaming the file.
+- Serve images via `GET /api/recipes/:id/image` by reading and streaming the file. Set the `Content-Type` response header to the MIME type that corresponds to the stored file extension so the browser can render it correctly.
 - On image removal (`DELETE /api/recipes/:id/image`), delete the file and respond 204.
 
 ## Error Handling
