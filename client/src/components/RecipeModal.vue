@@ -44,9 +44,11 @@
               <DialogTitle class="modal-title">
                 {{ mode === 'create' ? 'New Recipe' : 'Edit Recipe' }}
               </DialogTitle>
-              <BaseButton variant="icon" size="sm" square title="Cancel" aria-label="Cancel" @click="handleCancel">
-                <span class="mdi mdi-close" aria-hidden="true"></span>
-              </BaseButton>
+              <div class="modal-actions">
+                <BaseButton variant="icon" size="sm" square title="Cancel" aria-label="Cancel" @click="handleCancel">
+                  <span class="mdi mdi-close" aria-hidden="true"></span>
+                </BaseButton>
+              </div>
             </div>
 
             <div class="modal-scroll">
@@ -184,9 +186,9 @@
 }
 
 .modal-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  color: inherit;
+  color: rgba(0, 0, 0, 0.85);
   flex: 1;
   word-break: break-word;
 }
@@ -198,7 +200,8 @@
 }
 
 .modal-actions .mdi {
-  font-size: 20px;
+  font-size: 22px;
+  color: rgba(0, 0, 0, 0.85);
 }
 
 /* Tags (view mode) */
