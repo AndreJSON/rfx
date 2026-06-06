@@ -11,6 +11,7 @@ applyTo: "server/**"
 - Listens on **port 8080**.
 - Serves the Vue production build as static files from `../client/dist/` for all non-API routes.
 - All recipe API routes are prefixed `/api/recipes`.
+- No caching is used, since number of recipes will be low.
 
 ## File System
 
@@ -46,7 +47,6 @@ applyTo: "server/**"
 
 - Implement a `parseRecipe(text: string)` and `serialiseRecipe(recipe)` utility in `server/lib/recipe.js` (or `.ts`).
 - See data model instructions for the `recipe.txt` format.
-- Serialisation must produce deterministic output (consistent section order: TITLE, TAGS, BODY).
 
 ## API Endpoints
 
