@@ -28,14 +28,7 @@ applyTo: "server/**"
 
 ## Image Handling
 
-- Accept image uploads via `multipart/form-data` using `multer` (or equivalent).
-- Only the following MIME types are accepted: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/heic`, `image/heif`, `image/avif`. Reject any other type with `400 { "error": "Unsupported image type" }`.
-- **Detect the MIME type from the file's magic bytes** (e.g. using the `file-type` package) — do **not** trust the client-reported `Content-Type` or the original filename extension.
-- Derive the file extension from the detected MIME type (e.g. `image/jpeg` → `.jpg`). Use a fixed mapping; do not rely on the original filename.
-- Store uploaded image as `server/data/{uuid}/image.{detectedExtension}`.
-- Only one image per recipe — any existing image file is deleted before saving the new one.
-- Serve images via `GET /api/recipes/:id/image` by reading and streaming the file. Set the `Content-Type` response header to the MIME type that corresponds to the stored file extension so the browser can render it correctly.
-- On image removal (`DELETE /api/recipes/:id/image`), delete the file and respond 204.
+See [image.instructions.md](image.instructions.md) for full image handling rules (accepted MIME types, magic byte detection, file storage, and API behaviour).
 
 ## Error Handling
 
@@ -62,7 +55,7 @@ applyTo: "server/**"
 | `DELETE` | `/api/recipes/:id/image` | — | `204` |
 | `GET` | `/api/recipes/:id/image` | — | Image file stream |
 
-`imageUrl` is a relative path the client can use directly, e.g. `/api/recipes/{id}/image`.
+`imageUrl` is a relative path the client can use directly, e.g. `/api/recipes/{id}/image`. See [image.instructions.md](image.instructions.md) for full image endpoint details.
 
 ## Search
 
