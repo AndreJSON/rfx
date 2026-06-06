@@ -27,7 +27,7 @@ server/data/
 ```
 
 - The folder name **is** the recipe ID.
-- Image filename is always `image` with the original extension preserved (e.g. `image.png`, `image.jpg`).
+- Image filename is always `image` with an extension derived from the **detected** MIME type (e.g. `image.png`, `image.jpg`) — never from the client-supplied filename or `Content-Type` header.
 - Only `recipe.txt`, `image.{ext}`, and `deleted.txt` should be placed in a recipe folder.
 
 ## `recipe.txt` Format
@@ -60,7 +60,7 @@ Parsing rules:
 - `created` and `updated` are **internal fields** — they must not be included in any API response sent to the frontend.
 - `tags`: each element must match `/^\S+$/` (no whitespace), plain text only. Duplicates should be deduplicated.
 - `body`: optional free-form plain text string; newlines are preserved; no HTML or other markup.
-- `image`: server accepts `multipart/form-data`; only one image per recipe; replaces any existing image on upload; deleted from disk on removal. Only the following MIME types are accepted: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/heic`, `image/heif`, `image/avif`. Uploads with any other MIME type must be rejected with `400`.
+- `image`: server accepts `multipart/form-data`; only one image per recipe; replaces any existing image on upload; deleted from disk on removal. Only the following MIME types are accepted: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/heic`, `image/heif`, `image/avif`. Uploads with any other MIME type must be rejected with `400`. The MIME type **must be detected from the file's magic bytes** — the client-supplied `Content-Type` and original filename extension must not be trusted.
 
 ## Deletion Model
 
