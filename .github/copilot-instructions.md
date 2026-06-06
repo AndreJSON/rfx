@@ -59,6 +59,5 @@ npm start            # starts the Node server on port 8080
 
 - Use `async/await` throughout; no raw callback patterns.
 - REST endpoints are prefixed `/api/recipes`.
-- File system operations must be atomic where possible (write to temp, then rename).
 - Pinia stores are the single source of truth for frontend state — no ad-hoc local reactive state for recipe data.
 - Radix UI primitives are used for all interactive components (Dialog, Tooltip, etc.); avoid custom re-implementations.
