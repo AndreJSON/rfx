@@ -50,7 +50,7 @@ applyTo: "client/**"
 - Title field must reject newlines (strip on input or prevent via keydown).
 - Tag input must reject whitespace (validate before adding tag).
 - Image: show current image with a remove button; show upload control when no image is present.
-- A recipe can have **at most one image** — uploading replaces the existing one. See [image.instructions.md](image.instructions.md) for full image upload/remove behaviour.
+- See [image.instructions.md](image.instructions.md) for full image upload/remove behaviour.
 - Save action calls the Pinia store method which calls the API.
 - On successful save, modal is transformed to read mode.
 
@@ -63,7 +63,8 @@ Responsibilities:
 - `createRecipe(data)` — POST then refresh list.
 - `updateRecipe(id, data)` — PUT then update local state.
 - `deleteRecipe(id)` — DELETE then remove from list.
-- `uploadImage(id, file)` / `removeImage(id)` — image mutations; see [image.instructions.md](image.instructions.md).
+- `uploadImage(id, file)` — calls `POST /api/recipes/:id/image` and updates local state.
+- `removeImage(id)` — calls `DELETE /api/recipes/:id/image` and updates local state.
 - `searchQuery` — reactive string used to filter the displayed list.
 
 ## Styling Conventions

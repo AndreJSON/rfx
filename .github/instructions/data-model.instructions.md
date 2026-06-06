@@ -12,7 +12,7 @@ description: "Use when working with recipe data, the recipe file format, disk pe
 | `title`   | `string` | Yes      | Non-empty; no newline characters; plain text only |
 | `tags`    | `string[]` | No     | Each tag contains no whitespace; stored as comma-separated in file; plain text only |
 | `body`    | `string` | No       | Free-form multi-line plain text; no HTML or other markup |
-| `image`   | `string \| null` | No | Relative filename (e.g. `image.jpg`); at most one image per recipe. See [image.instructions.md](image.instructions.md) |
+| `imageUrl`   | `string \| null` | No | Relative filename (e.g. `image.jpg`); at most one image per recipe. See [image.instructions.md](image.instructions.md) |
 | `created` | `string` | Yes      | ISO 8601 timestamp; set by backend on creation; never updated; **never sent to the frontend** |
 | `updated` | `string` | Yes      | ISO 8601 timestamp; set by backend on creation and on every PUT; **never sent to the frontend** |
 
@@ -23,12 +23,11 @@ server/data/
 └── {uuid}/
     ├── recipe.txt       # always present
     ├── image.{ext}      # optional; only one image file per folder
-    └── deleted.txt      # optional; presence marks recipe as deleted
 ```
 
 - The folder name **is** the recipe ID.
 - Image filename convention and MIME type detection: see [image.instructions.md](image.instructions.md).
-- Only `recipe.txt`, `image.{ext}`, and `deleted.txt` should be placed in a recipe folder.
+- Only `recipe.txt` and `image.{ext}` should be placed in a recipe folder.
 
 ## `recipe.txt` Format
 
@@ -57,17 +56,18 @@ Parsing rules:
 - `title`: required, `string`, plain text only, strip leading/trailing whitespace, reject if empty or contains `\n`.
 - `created`: set by backend to `new Date().toISOString()` on recipe creation; never modified after that.
 - `updated`: set by backend to `new Date().toISOString()` on creation and overwritten on every PUT.
-- `created` and `updated` are **internal fields** — they must not be included in any API response sent to the frontend.
+- `deleted`: set by backend to `new Date().toISOString()` on deletion. This marks the recipe as **soft-deleted**. Everything related to the recipe still remains on disk.
+- `created`, `updated` and `deleted` are **internal fields** — they must not be included in any API response sent to the frontend.
 - `tags`: each element must match `/^\S+$/` (no whitespace), plain text only. Duplicates should be deduplicated.
 - `body`: optional free-form plain text string; newlines are preserved; no HTML or other markup.
 - `image`: at most one image per recipe; replaces any existing image on upload; deleted from disk on removal. See [image.instructions.md](image.instructions.md) for accepted MIME types and validation rules.
 
-## Deletion Model
+## Deleted recipes
 
-Recipes are **soft-deleted** by placing an empty `deleted.txt` file in the recipe's folder. The folder and `recipe.txt` remain on disk.
+Recipes are **soft-deleted** by specifying a `deleted` date.
 
 - **Deleted recipes are excluded** from all API list and fetch responses — the UI has no view for them.
-- **Deletion is not reversible through the UI or API.** To restore a recipe, manually remove `deleted.txt` from the recipe's folder on disk.
-- Any endpoint that operates on a recipe (GET, PUT, image upload/removal) must treat a folder containing `deleted.txt` as non-existent and respond with `404`.
+- **Deletion is not reversible through the UI or API.** To restore a recipe, manually remove `deleted` date from the recipe text file.
+- Any endpoint that operates on a recipe (GET, PUT, image upload/removal) must treat a recipe containing a `deleted` date as non-existent and respond with `404`.
 - `GET /api/recipes` must not include deleted recipes in its listing.
 
