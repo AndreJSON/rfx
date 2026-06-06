@@ -267,9 +267,15 @@ async function handleDelete() {
             <div class="modal-header">
               <DialogTitle class="modal-title">{{ recipe.title }}</DialogTitle>
               <div class="modal-actions">
-                <button class="icon-btn" title="Edit" @click="startEdit">✏️</button>
-                <button class="icon-btn" title="Delete" @click="handleDelete">🗑️</button>
-                <button class="icon-btn" title="Close" @click="emit('close')">✕</button>
+                <button class="icon-btn" type="button" title="Edit" aria-label="Edit" @click="startEdit">
+                  <span class="mdi mdi-pencil" aria-hidden="true"></span>
+                </button>
+                <button class="icon-btn" type="button" title="Delete" aria-label="Delete" @click="handleDelete">
+                  <span class="mdi mdi-trash-can-outline" aria-hidden="true"></span>
+                </button>
+                <button class="icon-btn" type="button" title="Close" aria-label="Close" @click="emit('close')">
+                  <span class="mdi mdi-close" aria-hidden="true"></span>
+                </button>
               </div>
             </div>
             <div v-if="recipe.tags.length > 0" class="tags-row">
@@ -290,7 +296,9 @@ async function handleDelete() {
               <DialogTitle class="modal-title">
                 {{ mode === 'create' ? 'New Recipe' : 'Edit Recipe' }}
               </DialogTitle>
-              <button class="icon-btn" title="Cancel" @click="handleCancel">✕</button>
+              <button class="icon-btn" type="button" title="Cancel" aria-label="Cancel" @click="handleCancel">
+                <span class="mdi mdi-close" aria-hidden="true"></span>
+              </button>
             </div>
 
             <div class="form">
@@ -312,7 +320,9 @@ async function handleDelete() {
                   class="tag tag--chip"
                 >
                   {{ tag }}
-                  <button class="tag-remove" type="button" @click="removeTag(tag)">×</button>
+                  <button class="tag-remove" type="button" aria-label="Remove tag" @click="removeTag(tag)">
+                    <span class="mdi mdi-close" aria-hidden="true"></span>
+                  </button>
                 </span>
                 <input
                   v-model="tagInput"
@@ -435,6 +445,10 @@ async function handleDelete() {
   background: #f0f0f0;
 }
 
+.icon-btn .mdi {
+  font-size: 20px;
+}
+
 /* Tags (view mode) */
 .tags-row {
   display: flex;
@@ -444,8 +458,8 @@ async function handleDelete() {
 }
 
 .tag {
-  background: #e0f2f2;
-  color: #006666;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
   border-radius: 4px;
   padding: 3px 8px;
   font-size: 13px;
@@ -498,7 +512,7 @@ async function handleDelete() {
 
 .field-input:focus,
 .field-textarea:focus {
-  border-color: #008080;
+  border-color: var(--color-primary);
 }
 
 .field-textarea {
@@ -528,11 +542,17 @@ async function handleDelete() {
 .tag-remove {
   background: none;
   border: none;
-  color: #006666;
-  font-size: 16px;
-  line-height: 1;
+  color: var(--color-primary-dark);
   cursor: pointer;
   padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tag-remove .mdi {
+  font-size: 16px;
+  line-height: 1;
 }
 
 .tag-input {
@@ -589,12 +609,12 @@ async function handleDelete() {
 }
 
 .btn--primary {
-  background: #008080;
+  background: var(--color-primary);
   color: white;
 }
 
 .btn--primary:hover {
-  background: #006666;
+  background: var(--color-primary-dark);
 }
 
 .btn--primary:disabled {

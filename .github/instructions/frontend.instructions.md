@@ -10,13 +10,14 @@ applyTo: "client/**"
 - **Vue 3** with `<script setup>` syntax and Composition API throughout.
 - **Pinia** for all shared state — one store per logical domain (e.g. `useRecipeStore`).
 - **Radix UI Vue** for interactive primitives (Dialog, DropdownMenu, Tooltip, etc.).
+- **@mdi/font** npm package is required and must be used for all fonts in the frontend.
 - **Vite** as the build tool.
 
 ## Application Layout (single page)
 
 ```
 ┌─────────────────────────────────────────────┐
-│  Toolbar (teal background)                  │
+│  Toolbar                                    │
 │  [ Search bar              ] [ + ]          │
 ├─────────────────────────────────────────────┤
 │  Recipe List                                │
@@ -28,7 +29,7 @@ applyTo: "client/**"
 └─────────────────────────────────────────────┘
 ```
 
-- The toolbar has a **teal** background color.
+- The toolbar uses primary color for its background.
 - The search bar filters the recipe list in real time (client-side filter on title and tags).
 - The `+` button opens the recipe modal in "create" mode.
 
@@ -69,7 +70,7 @@ Responsibilities:
 
 ## Styling Conventions
 
-- Teal toolbar: use CSS custom property `--color-primary: teal` (or a specific hex like `#008080`).
+- Teal (#81C784) is the primary color of the app.
 - Prefer scoped `<style scoped>` blocks in single-file components.
 - Do not introduce a separate CSS framework (e.g. Tailwind) unless already present.
 

@@ -19,7 +19,7 @@ const filtered = computed(() => {
   <div class="recipe-list">
     <div v-if="filtered.length === 0" class="empty-state">
       <template v-if="store.searchQuery">No recipes match your search.</template>
-      <template v-else>No recipes yet. Click + to add one.</template>
+      <template v-else>No recipes yet. Click the add button to create one.</template>
     </div>
     <button
       v-for="recipe in filtered"

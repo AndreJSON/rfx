@@ -36,7 +36,9 @@ function closeModal() {
         type="search"
         placeholder="Search recipes…"
       />
-      <button class="add-btn" title="New recipe" @click="openCreate">+</button>
+      <button class="add-btn" type="button" title="New recipe" aria-label="New recipe" @click="openCreate">
+        <span class="mdi mdi-plus" aria-hidden="true"></span>
+      </button>
     </header>
     <main class="content">
       <RecipeList @open-recipe="openRecipe" />
@@ -57,8 +59,9 @@ function closeModal() {
 }
 
 :root {
-  --color-primary: #008080;
-  --color-primary-dark: #006666;
+  --color-primary: #81c784;
+  --color-primary-dark: #66bb6a;
+  --color-primary-soft: #e8f5e9;
   font-family: system-ui, -apple-system, sans-serif;
 }
 
@@ -110,6 +113,10 @@ body {
   justify-content: center;
   font-weight: bold;
   flex-shrink: 0;
+}
+
+.add-btn .mdi {
+  font-size: 24px;
 }
 
 .add-btn:hover {
