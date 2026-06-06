@@ -109,9 +109,20 @@
                 </div>
                 <div v-else class="image-upload-row">
                   <input
+                    ref="fileInputRef"
+                    class="file-input-native"
                     type="file"
                     accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif,image/avif"
                     @change="handleImageFileSelect"
+                  />
+                  <BaseButton variant="surface" size="md" type="button" @click="openFilePicker">
+                    Upload image
+                  </BaseButton>
+                  <input
+                    class="file-name"
+                    :value="pendingImageFile?.name || ''"
+                    type="text"
+                    readonly
                   />
                 </div>
               </div>
@@ -304,7 +315,18 @@
 }
 
 .image-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-top: 4px;
+}
+
+.file-input-native {
+  display: none;
+}
+
+.file-name {
+  display: none;
 }
 
 /* Error */
@@ -357,6 +379,7 @@ const editTitle = ref('');
 const editBody = ref('');
 const editTags = ref([]);
 const tagInput = ref('');
+const fileInputRef = ref(null);
 
 // Image handling
 const imageTimestamp = ref(Date.now()); // cache-busting for API images
@@ -428,6 +451,14 @@ function clearPendingImage() {
     pendingImagePreviewUrl.value = null;
   }
   pendingImageFile.value = null;
+  if (fileInputRef.value) fileInputRef.value.value = '';
+}
+
+function openFilePicker() {
+  if (fileInputRef.value) {
+    fileInputRef.value.value = '';
+    fileInputRef.value.click();
+  }
 }
 
 // --- Tag input ---
