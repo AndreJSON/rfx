@@ -50,10 +50,10 @@ applyTo: "server/**"
 
 | Method | Path | Request | Response |
 |--------|------|---------|----------|
-| `GET` | `/api/recipes` | — | `200` `[{ id, title, tags }]` |
+| `GET` | `/api/recipes` | — | `200` `[{ id, title, tags }]` sorted by `created` ascending |
 | `GET` | `/api/recipes/:id` | — | `200` `{ id, title, tags, body, imageUrl }` |
 | `POST` | `/api/recipes` | JSON `{ title, tags?, body? }` | `201` `{ id, title, tags, body }` |
-| `PUT` | `/api/recipes/:id` | JSON `{ title?, tags?, body? }` | `200` updated recipe |
+| `PUT` | `/api/recipes/:id` | JSON `{ title, tags, body }` — all fields required; all fields are always overwritten; send `""` / `[]` to clear optional fields | `200` updated recipe |
 | `DELETE` | `/api/recipes/:id` | — | `204` |
 | `POST` | `/api/recipes/:id/image` | `multipart/form-data` field `image` | `200` `{ imageUrl }` |
 | `DELETE` | `/api/recipes/:id/image` | — | `204` |
