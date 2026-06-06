@@ -42,9 +42,11 @@ applyTo: "client/**"
 ## Modals
 
 ### Recipe Modal (read mode)
-- Displays: title, tags, body text, image (if present).
+- Displays: title, tags, body text, image (if present). Elements should appear in this order from top to bottom.
 - Controls: `×` (close) icon button, pen/edit icon button, trash icon button for delete.
 - Clicking the pen icon transforms model to edit mode.
+- Top part of dialog (title and buttons) should remain fixed when body content is long and causes scrolling.
+- Top part of dialog should have the primary color as background, and the content area should have a light neutral background.
 
 ### Recipe Modal (edit/create mode)
 - Editable fields: title (input), body (textarea), tags (add/remove chips), image (upload or remove).

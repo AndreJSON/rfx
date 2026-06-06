@@ -278,14 +278,16 @@ async function handleDelete() {
                 </button>
               </div>
             </div>
-            <div v-if="recipe.tags.length > 0" class="tags-row">
-              <span v-for="tag in recipe.tags" :key="tag" class="tag">{{ tag }}</span>
+            <div class="modal-scroll">
+              <div v-if="recipe.tags.length > 0" class="tags-row">
+                <span v-for="tag in recipe.tags" :key="tag" class="tag">{{ tag }}</span>
+              </div>
+              <div v-if="recipe.body" class="body-text">{{ recipe.body }}</div>
+              <div v-if="displayImageUrl" class="image-section">
+                <img :src="displayImageUrl" class="recipe-image" alt="Recipe image" />
+              </div>
+              <div v-if="error" class="error-msg">{{ error }}</div>
             </div>
-            <div v-if="displayImageUrl" class="image-section">
-              <img :src="displayImageUrl" class="recipe-image" alt="Recipe image" />
-            </div>
-            <div v-if="recipe.body" class="body-text">{{ recipe.body }}</div>
-            <div v-if="error" class="error-msg">{{ error }}</div>
           </div>
         </template>
 
@@ -301,71 +303,73 @@ async function handleDelete() {
               </button>
             </div>
 
-            <div class="form">
-              <label class="field-label">Title</label>
-              <input
-                v-model="editTitle"
-                class="field-input"
-                type="text"
-                placeholder="Recipe title"
-                @keydown="handleTitleKeydown"
-                @input="handleTitleInput"
-              />
-
-              <label class="field-label">Tags</label>
-              <div class="tags-edit">
-                <span
-                  v-for="tag in editTags"
-                  :key="tag"
-                  class="tag tag--chip"
-                >
-                  {{ tag }}
-                  <button class="tag-remove" type="button" aria-label="Remove tag" @click="removeTag(tag)">
-                    <span class="mdi mdi-close" aria-hidden="true"></span>
-                  </button>
-                </span>
+            <div class="modal-scroll">
+              <div class="form">
+                <label class="field-label">Title</label>
                 <input
-                  v-model="tagInput"
-                  class="tag-input"
+                  v-model="editTitle"
+                  class="field-input"
                   type="text"
-                  placeholder="Add tag…"
-                  @keydown="handleTagKeydown"
-                  @input="handleTagInput"
-                  @blur="commitTag"
+                  placeholder="Recipe title"
+                  @keydown="handleTitleKeydown"
+                  @input="handleTitleInput"
                 />
+
+                <label class="field-label">Body</label>
+                <textarea
+                  v-model="editBody"
+                  class="field-textarea"
+                  rows="6"
+                  placeholder="Recipe instructions…"
+                />
+
+                <label class="field-label">Tags</label>
+                <div class="tags-edit">
+                  <span
+                    v-for="tag in editTags"
+                    :key="tag"
+                    class="tag tag--chip"
+                  >
+                    {{ tag }}
+                    <button class="tag-remove" type="button" aria-label="Remove tag" @click="removeTag(tag)">
+                      <span class="mdi mdi-close" aria-hidden="true"></span>
+                    </button>
+                  </span>
+                  <input
+                    v-model="tagInput"
+                    class="tag-input"
+                    type="text"
+                    placeholder="Add tag…"
+                    @keydown="handleTagKeydown"
+                    @input="handleTagInput"
+                    @blur="commitTag"
+                  />
+                </div>
+
+                <label class="field-label">Image</label>
+                <div v-if="displayImageUrl" class="image-edit-row">
+                  <img :src="displayImageUrl" class="image-thumb" alt="Current image" />
+                  <button class="btn btn--danger btn--sm" type="button" @click="handleImageRemove">
+                    Remove image
+                  </button>
+                </div>
+                <div v-else class="image-upload-row">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif,image/avif"
+                    @change="handleImageFileSelect"
+                  />
+                </div>
               </div>
 
-              <label class="field-label">Body</label>
-              <textarea
-                v-model="editBody"
-                class="field-textarea"
-                rows="6"
-                placeholder="Recipe instructions…"
-              />
+              <div v-if="error" class="error-msg">{{ error }}</div>
 
-              <label class="field-label">Image</label>
-              <div v-if="displayImageUrl" class="image-edit-row">
-                <img :src="displayImageUrl" class="image-thumb" alt="Current image" />
-                <button class="btn btn--danger btn--sm" type="button" @click="handleImageRemove">
-                  Remove image
+              <div class="modal-footer">
+                <button class="btn btn--secondary" type="button" @click="handleCancel">Cancel</button>
+                <button class="btn btn--primary" type="button" :disabled="isLoading" @click="handleSave">
+                  Save
                 </button>
               </div>
-              <div v-else class="image-upload-row">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif,image/avif"
-                  @change="handleImageFileSelect"
-                />
-              </div>
-            </div>
-
-            <div v-if="error" class="error-msg">{{ error }}</div>
-
-            <div class="modal-footer">
-              <button class="btn btn--secondary" type="button" @click="handleCancel">Cancel</button>
-              <button class="btn btn--primary" type="button" :disabled="isLoading" @click="handleSave">
-                Save
-              </button>
             </div>
           </div>
         </template>
@@ -394,12 +398,22 @@ async function handleDelete() {
   width: 90%;
   max-width: 560px;
   max-height: 85vh;
-  overflow-y: auto;
+  overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .modal-inner {
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 85vh;
+}
+
+.modal-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 20px;
+  background: #f7f8f5;
 }
 
 .loading {
@@ -413,13 +427,15 @@ async function handleDelete() {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
+  padding: 14px 16px;
+  background: var(--color-primary);
+  color: #fff;
 }
 
 .modal-title {
   font-size: 20px;
   font-weight: 700;
-  color: #111;
+  color: inherit;
   flex: 1;
   word-break: break-word;
 }
@@ -437,12 +453,12 @@ async function handleDelete() {
   cursor: pointer;
   padding: 4px 6px;
   border-radius: 4px;
-  color: #555;
+  color: #fff;
   line-height: 1;
 }
 
 .icon-btn:hover {
-  background: #f0f0f0;
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .icon-btn .mdi {
