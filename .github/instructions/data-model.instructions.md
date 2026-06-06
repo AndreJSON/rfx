@@ -60,7 +60,7 @@ Parsing rules:
 - `created` and `updated` are **internal fields** — they must not be included in any API response sent to the frontend.
 - `tags`: each element must match `/^\S+$/` (no whitespace), plain text only. Duplicates should be deduplicated.
 - `body`: optional free-form plain text string; newlines are preserved; no HTML or other markup.
-- `image`: server accepts `multipart/form-data`; only one image per recipe; replaces any existing image on upload; deleted from disk on removal.
+- `image`: server accepts `multipart/form-data`; only one image per recipe; replaces any existing image on upload; deleted from disk on removal. Only the following MIME types are accepted: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/heic`, `image/heif`, `image/avif`. Uploads with any other MIME type must be rejected with `400`.
 
 ## Deletion Model
 
@@ -77,8 +77,8 @@ Recipes are **soft-deleted** by placing an empty `deleted.txt` file in the recip
 |--------|------|-------------|
 | `GET` | `/api/recipes` | List all non-deleted recipes (id, title, tags only), sorted by `created` ascending |
 | `GET` | `/api/recipes/:id` | Full recipe including body and image URL; 404 if deleted |
-| `POST` | `/api/recipes` | Create recipe; body: `{ title, tags?, body? }` |
-| `PUT` | `/api/recipes/:id` | Replace all recipe fields; all fields (`title`, `tags`, `body`) are required — omitting a field is not allowed; send an empty string/array to clear an optional field; 404 if deleted |
+| `POST` | `/api/recipes` | Create recipe; body: `{ title, tags?, body? }`; returns `{ id, title, tags, body, imageUrl }` (`imageUrl` is `null` on creation) |
+| `PUT` | `/api/recipes/:id` | Replace all recipe fields; all fields (`title`, `tags`, `body`) are required — omitting a field is not allowed; send an empty string/array to clear an optional field; returns `{ id, title, tags, body, imageUrl }`; 404 if deleted |
 | `DELETE` | `/api/recipes/:id` | Soft-delete: creates an empty `deleted.txt` in the recipe folder; 404 if already deleted |
 | `POST` | `/api/recipes/:id/image` | Upload image (`multipart/form-data`); 404 if deleted |
 | `DELETE` | `/api/recipes/:id/image` | Remove image; 404 if deleted |

@@ -28,6 +28,8 @@ applyTo: "server/**"
 ## Image Handling
 
 - Accept image uploads via `multipart/form-data` using `multer` (or equivalent).
+- Only the following MIME types are accepted: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/heic`, `image/heif`, `image/avif`. Reject any other type with `400 { "error": "Unsupported image type" }`.
+- Validate MIME type using the `mimetype` reported by multer (from the `Content-Type` of the file part).
 - Store uploaded image as `server/data/{uuid}/image.{originalExtension}`.
 - Only one image per recipe — any existing image file is deleted before saving the new one.
 - Serve images via `GET /api/recipes/:id/image` by reading and streaming the file.
@@ -52,8 +54,8 @@ applyTo: "server/**"
 |--------|------|---------|----------|
 | `GET` | `/api/recipes` | — | `200` `[{ id, title, tags }]` sorted by `created` ascending |
 | `GET` | `/api/recipes/:id` | — | `200` `{ id, title, tags, body, imageUrl }` |
-| `POST` | `/api/recipes` | JSON `{ title, tags?, body? }` | `201` `{ id, title, tags, body }` |
-| `PUT` | `/api/recipes/:id` | JSON `{ title, tags, body }` — all fields required; all fields are always overwritten; send `""` / `[]` to clear optional fields | `200` updated recipe |
+| `POST` | `/api/recipes` | JSON `{ title, tags?, body? }` | `201` `{ id, title, tags, body, imageUrl }` (`imageUrl` is `null` on creation) |
+| `PUT` | `/api/recipes/:id` | JSON `{ title, tags, body }` — all fields required; all fields are always overwritten; send `""` / `[]` to clear optional fields | `200` `{ id, title, tags, body, imageUrl }` |
 | `DELETE` | `/api/recipes/:id` | — | `204` |
 | `POST` | `/api/recipes/:id/image` | `multipart/form-data` field `image` | `200` `{ imageUrl }` |
 | `DELETE` | `/api/recipes/:id/image` | — | `204` |
