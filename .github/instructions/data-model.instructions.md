@@ -20,12 +20,13 @@ description: "Use when working with recipe data, the recipe file format, disk pe
 server/data/
 └── {uuid}/
     ├── recipe.txt       # always present
-    └── image.{ext}      # optional; only one image file per folder
+    ├── image.{ext}      # optional; only one image file per folder
+    └── deleted.txt      # optional; presence marks recipe as deleted
 ```
 
 - The folder name **is** the recipe ID.
 - Image filename is always `image` with the original extension preserved (e.g. `image.png`, `image.jpg`).
-- No other files should be placed in a recipe folder.
+- Only `recipe.txt`, `image.{ext}`, and `deleted.txt` should be placed in a recipe folder.
 
 ## `recipe.txt` Format
 
@@ -52,15 +53,24 @@ Parsing rules:
 - `body`: optional free-form plain text string; newlines are preserved; no HTML or other markup.
 - `image`: server accepts `multipart/form-data`; only one image per recipe; replaces any existing image on upload; deleted from disk on removal.
 
+## Deletion Model
+
+Recipes are **soft-deleted** by placing an empty `deleted.txt` file in the recipe's folder. The folder and `recipe.txt` remain on disk.
+
+- **Deleted recipes are excluded** from all API list and fetch responses — the UI has no view for them.
+- **Deletion is not reversible through the UI or API.** To restore a recipe, manually remove `deleted.txt` from the recipe's folder on disk.
+- Any endpoint that operates on a recipe (GET, PUT, image upload/removal) must treat a folder containing `deleted.txt` as non-existent and respond with `404`.
+- `GET /api/recipes` must not include deleted recipes in its listing.
+
 ## API Contract (summary)
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/api/recipes` | List all recipes (id, title, tags only) |
-| `GET` | `/api/recipes/:id` | Full recipe including body and image URL |
+| `GET` | `/api/recipes` | List all non-deleted recipes (id, title, tags only) |
+| `GET` | `/api/recipes/:id` | Full recipe including body and image URL; 404 if deleted |
 | `POST` | `/api/recipes` | Create recipe; body: `{ title, tags?, body? }` |
-| `PUT` | `/api/recipes/:id` | Update recipe fields |
-| `DELETE` | `/api/recipes/:id` | Delete recipe and its folder |
-| `POST` | `/api/recipes/:id/image` | Upload image (`multipart/form-data`) |
-| `DELETE` | `/api/recipes/:id/image` | Remove image |
-| `GET` | `/api/recipes/:id/image` | Serve image file |
+| `PUT` | `/api/recipes/:id` | Update recipe fields; 404 if deleted |
+| `DELETE` | `/api/recipes/:id` | Soft-delete: creates an empty `deleted.txt` in the recipe folder; 404 if already deleted |
+| `POST` | `/api/recipes/:id/image` | Upload image (`multipart/form-data`); 404 if deleted |
+| `DELETE` | `/api/recipes/:id/image` | Remove image; 404 if deleted |
+| `GET` | `/api/recipes/:id/image` | Serve image file; 404 if deleted |
