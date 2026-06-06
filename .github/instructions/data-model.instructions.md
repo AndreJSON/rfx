@@ -12,10 +12,10 @@ description: "Use when working with recipe data, the recipe file format, disk pe
 | `title`   | `string` | Non-empty; no newline characters; plain text only |
 | `tags`    | `string[]` | Each tag contains no whitespace; stored as comma-separated in file; plain text only |
 | `body`    | `string` | Free-form multi-line plain text; no HTML or other markup |
-| `imageName`   | `string \| null` | Filename (e.g. `image.jpg`); at most one image per recipe. See [image.instructions.md](image.instructions.md) |
+| `imageName`   | `string \| null` | Filename (e.g. `image.jpg`); See [image.instructions.md](image.instructions.md) |
 | `created` | `string` | ISO 8601 timestamp; set by backend on creation; never updated; **never sent to the frontend** |
 | `updated` | `string` | ISO 8601 timestamp; set by backend on creation and on every PUT; **never sent to the frontend** |
-| `deleted` | `string \| null` | ISO 8601 timestamp; set by backend on creation and on every PUT; **never sent to the frontend** |
+| `deleted` | `string \| null` | ISO 8601 timestamp; set by backend on soft deletion of recipe; **never sent to the frontend** |
 
 ## Disk Layout
 
@@ -23,7 +23,7 @@ description: "Use when working with recipe data, the recipe file format, disk pe
 server/data/
 └── {uuid}/
     ├── recipe.txt       # always present
-    ├── image.{ext}      # optional; only one image file per folder
+    ├── image.{ext}      # optional
 ```
 
 - The folder name **is** the recipe ID.
@@ -49,10 +49,10 @@ Parsing rules:
 - Line 1 is always `TITLE:` — value is the rest of the line (trimmed).
 - Line 2 is always `CREATED:` — ISO 8601 timestamp set on creation; never changes.
 - Line 3 is always `UPDATED:` — ISO 8601 timestamp updated on every PUT.
-- Line 4 is always `DELETED:` — ISO 8601 timestamp if the recipe is marked as deleted. Empty if recipe is marked as deleted.
+- Line 4 is always `DELETED:` — ISO 8601 timestamp if the recipe is marked as deleted. Empty if recipe is NOT marked as deleted.
 - Line 5 is always `TAGS:` — value is the rest of the line, comma-separated. Empty if no tags.
 - Line 6 onward is always `BODY:` — the first line's value starts after the colon; subsequent lines until EOF are continuation lines. Empty if no body.
-- All five sections are always written.
+- All sections are always written.
 
 ## Validation Rules
 
