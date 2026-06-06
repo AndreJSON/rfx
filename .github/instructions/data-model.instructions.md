@@ -71,15 +71,3 @@ Recipes are **soft-deleted** by placing an empty `deleted.txt` file in the recip
 - Any endpoint that operates on a recipe (GET, PUT, image upload/removal) must treat a folder containing `deleted.txt` as non-existent and respond with `404`.
 - `GET /api/recipes` must not include deleted recipes in its listing.
 
-## API Contract (summary)
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/recipes` | List all non-deleted recipes (id, title, tags only), sorted by `created` ascending |
-| `GET` | `/api/recipes/:id` | Full recipe including body and image URL; 404 if deleted |
-| `POST` | `/api/recipes` | Create recipe; body: `{ title, tags?, body? }`; returns `{ id, title, tags, body, imageUrl }` (`imageUrl` is `null` on creation) |
-| `PUT` | `/api/recipes/:id` | Replace all recipe fields; all fields (`title`, `tags`, `body`) are required — omitting a field is not allowed; send an empty string/array to clear an optional field; returns `{ id, title, tags, body, imageUrl }`; 404 if deleted |
-| `DELETE` | `/api/recipes/:id` | Soft-delete: creates an empty `deleted.txt` in the recipe folder; 404 if already deleted |
-| `POST` | `/api/recipes/:id/image` | Upload image (`multipart/form-data`); 404 if deleted |
-| `DELETE` | `/api/recipes/:id/image` | Remove image; 404 if deleted |
-| `GET` | `/api/recipes/:id/image` | Serve image file; 404 if deleted |
