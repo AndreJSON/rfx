@@ -54,3 +54,4 @@ npm start            # starts the Node server on port 8080
 - Radix UI primitives are used for all interactive components (Dialog, Tooltip, etc.); avoid custom re-implementations.
 - All vue files should use `<script setup>` syntax and Composition API.
 - All vue files should have html first, then style, then script.
+- Prefer creating reusable components for any UI element that could be useful in multiple places, such as buttons, modals, and form inputs.

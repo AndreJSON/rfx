@@ -4,15 +4,17 @@
       <template v-if="store.searchQuery">No recipes match your search.</template>
       <template v-else>No recipes yet. Click the add button to create one.</template>
     </div>
-    <button
+    <BaseButton
       v-for="recipe in filtered"
       :key="recipe.id"
+      variant="card"
+      size="lg"
       class="recipe-card"
       @click="emit('open-recipe', recipe.id)"
     >
       <span class="recipe-title">{{ recipe.title }}</span>
       <span class="recipe-tags">{{ recipe.tags.join(', ') }}</span>
-    </button>
+    </BaseButton>
   </div>
 </template>
 
@@ -31,22 +33,8 @@
 }
 
 .recipe-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  background: white;
-  border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 14px 16px;
-  cursor: pointer;
-  text-align: left;
-  width: 100%;
-  transition: box-shadow 0.15s;
-}
-
-.recipe-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .recipe-title {
@@ -64,6 +52,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useRecipeStore } from '../stores/recipeStore.js';
+import BaseButton from './ui/BaseButton.vue';
 
 const emit = defineEmits(['open-recipe']);
 const store = useRecipeStore();

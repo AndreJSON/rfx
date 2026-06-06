@@ -13,15 +13,15 @@
             <div class="modal-header">
               <DialogTitle class="modal-title">{{ recipe.title }}</DialogTitle>
               <div class="modal-actions">
-                <button class="icon-btn" type="button" title="Edit" aria-label="Edit" @click="startEdit">
+                <BaseButton variant="icon" size="sm" square title="Edit" aria-label="Edit" @click="startEdit">
                   <span class="mdi mdi-pencil" aria-hidden="true"></span>
-                </button>
-                <button class="icon-btn" type="button" title="Delete" aria-label="Delete" @click="handleDelete">
+                </BaseButton>
+                <BaseButton variant="icon" size="sm" square title="Delete" aria-label="Delete" @click="handleDelete">
                   <span class="mdi mdi-trash-can-outline" aria-hidden="true"></span>
-                </button>
-                <button class="icon-btn" type="button" title="Close" aria-label="Close" @click="emit('close')">
+                </BaseButton>
+                <BaseButton variant="icon" size="sm" square title="Close" aria-label="Close" @click="emit('close')">
                   <span class="mdi mdi-close" aria-hidden="true"></span>
-                </button>
+                </BaseButton>
               </div>
             </div>
             <div class="modal-scroll">
@@ -44,21 +44,20 @@
               <DialogTitle class="modal-title">
                 {{ mode === 'create' ? 'New Recipe' : 'Edit Recipe' }}
               </DialogTitle>
-              <button class="icon-btn" type="button" title="Cancel" aria-label="Cancel" @click="handleCancel">
+              <BaseButton variant="icon" size="sm" square title="Cancel" aria-label="Cancel" @click="handleCancel">
                 <span class="mdi mdi-close" aria-hidden="true"></span>
-              </button>
+              </BaseButton>
             </div>
 
             <div class="modal-scroll">
               <div class="form">
                 <label class="field-label">Title</label>
-                <input
+                <BaseInput
                   v-model="editTitle"
-                  class="field-input"
                   type="text"
                   placeholder="Recipe title"
                   @keydown="handleTitleKeydown"
-                  @input="handleTitleInput"
+                  @update:model-value="handleTitleInput"
                 />
 
                 <label class="field-label">Tags</label>
@@ -69,25 +68,32 @@
                     class="tag tag--chip"
                   >
                     {{ tag }}
-                    <button class="tag-remove" type="button" aria-label="Remove tag" @click="removeTag(tag)">
+                    <BaseButton
+                      class="tag-remove"
+                      variant="ghost"
+                      size="xs"
+                      square
+                      aria-label="Remove tag"
+                      @click="removeTag(tag)"
+                    >
                       <span class="mdi mdi-close" aria-hidden="true"></span>
-                    </button>
+                    </BaseButton>
                   </span>
-                  <input
+                  <BaseInput
                     v-model="tagInput"
                     class="tag-input"
+                    variant="tag"
                     type="text"
                     placeholder="Add tag…"
                     @keydown="handleTagKeydown"
-                    @input="handleTagInput"
+                    @update:model-value="handleTagInput"
                     @blur="commitTag"
                   />
                 </div>
 
                 <label class="field-label">Body</label>
-                <textarea
+                <BaseTextarea
                   v-model="editBody"
-                  class="field-textarea"
                   rows="6"
                   placeholder="Recipe instructions…"
                 />
@@ -95,9 +101,9 @@
                 <label class="field-label">Image</label>
                 <div v-if="displayImageUrl" class="image-edit-row">
                   <img :src="displayImageUrl" class="image-thumb" alt="Current image" />
-                  <button class="btn btn--danger btn--sm" type="button" @click="handleImageRemove">
+                  <BaseButton variant="danger" size="sm" @click="handleImageRemove">
                     Remove image
-                  </button>
+                  </BaseButton>
                 </div>
                 <div v-else class="image-upload-row">
                   <input
@@ -111,10 +117,10 @@
               <div v-if="error" class="error-msg">{{ error }}</div>
 
               <div class="modal-footer">
-                <button class="btn btn--secondary" type="button" @click="handleCancel">Cancel</button>
-                <button class="btn btn--primary" type="button" :disabled="isLoading" @click="handleSave">
+                <BaseButton variant="secondary" @click="handleCancel">Cancel</BaseButton>
+                <BaseButton variant="primary" :disabled="isLoading" @click="handleSave">
                   Save
-                </button>
+                </BaseButton>
               </div>
             </div>
           </div>
@@ -192,22 +198,7 @@
   flex-shrink: 0;
 }
 
-.icon-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 4px;
-  color: #fff;
-  line-height: 1;
-}
-
-.icon-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
-}
-
-.icon-btn .mdi {
+.modal-actions .mdi {
   font-size: 20px;
 }
 
@@ -261,26 +252,6 @@
   margin-top: 10px;
 }
 
-.field-input,
-.field-textarea {
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 15px;
-  outline: none;
-  width: 100%;
-  font-family: inherit;
-}
-
-.field-input:focus,
-.field-textarea:focus {
-  border-color: var(--color-primary);
-}
-
-.field-textarea {
-  resize: vertical;
-}
-
 /* Tags edit */
 .tags-edit {
   display: flex;
@@ -302,14 +273,7 @@
 }
 
 .tag-remove {
-  background: none;
-  border: none;
   color: var(--color-primary-dark);
-  cursor: pointer;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .tag-remove .mdi {
@@ -318,12 +282,7 @@
 }
 
 .tag-input {
-  border: none;
-  outline: none;
-  font-size: 14px;
   flex: 1;
-  min-width: 80px;
-  background: transparent;
 }
 
 /* Image edit */
@@ -360,52 +319,6 @@
   gap: 10px;
   margin-top: 18px;
 }
-
-.btn {
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-  font-family: inherit;
-}
-
-.btn--primary {
-  background: var(--color-primary);
-  color: white;
-}
-
-.btn--primary:hover {
-  background: var(--color-primary-dark);
-}
-
-.btn--primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn--secondary {
-  background: #f0f0f0;
-  color: #333;
-}
-
-.btn--secondary:hover {
-  background: #e0e0e0;
-}
-
-.btn--danger {
-  background: #fee2e2;
-  color: #b00;
-}
-
-.btn--danger:hover {
-  background: #fecaca;
-}
-
-.btn--sm {
-  padding: 5px 12px;
-  font-size: 13px;
-}
 </style>
 
 <script setup>
@@ -418,6 +331,9 @@ import {
   DialogTitle,
 } from 'radix-vue';
 import { useRecipeStore } from '../stores/recipeStore.js';
+import BaseButton from './ui/BaseButton.vue';
+import BaseInput from './ui/BaseInput.vue';
+import BaseTextarea from './ui/BaseTextarea.vue';
 
 const props = defineProps({
   open: Boolean,
@@ -515,7 +431,7 @@ function clearPendingImage() {
 // --- Tag input ---
 
 function handleTagKeydown(e) {
-  if (e.key === 'Enter' || e.key === ',') {
+  if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
     e.preventDefault();
     commitTag();
   }
@@ -523,8 +439,7 @@ function handleTagKeydown(e) {
 
 function handleTagInput(e) {
   // Strip whitespace and enforce uppercase as user types
-  e.target.value = e.target.value.replace(/\s/g, '').toUpperCase();
-  tagInput.value = e.target.value;
+  tagInput.value = e.replace(/\s/g, '').toUpperCase();
 }
 
 function commitTag() {
@@ -545,11 +460,8 @@ function handleTitleKeydown(e) {
   if (e.key === 'Enter') e.preventDefault();
 }
 
-function handleTitleInput(e) {
-  if (e.target.value.includes('\n')) {
-    e.target.value = e.target.value.replace(/\n/g, '');
-    editTitle.value = e.target.value;
-  }
+function handleTitleInput(value) {
+  editTitle.value = value.replace(/\n/g, '');
 }
 
 // --- Image handling ---

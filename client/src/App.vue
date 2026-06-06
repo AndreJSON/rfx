@@ -1,15 +1,24 @@
 <template>
   <div class="app">
     <header class="toolbar">
-      <input
+      <BaseInput
         v-model="store.searchQuery"
+        variant="search"
         class="search-input"
         type="search"
         placeholder="Search recipes…"
       />
-      <button class="add-btn" type="button" title="New recipe" aria-label="New recipe" @click="openCreate">
+      <BaseButton
+        class="add-btn"
+        variant="surface"
+        size="sm"
+        square
+        title="New recipe"
+        aria-label="New recipe"
+        @click="openCreate"
+      >
         <span class="mdi mdi-plus" aria-hidden="true"></span>
-      </button>
+      </BaseButton>
     </header>
     <main class="content">
       <RecipeList @open-recipe="openRecipe" />
@@ -62,36 +71,14 @@ body {
 
 .search-input {
   flex: 1;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  outline: none;
 }
 
 .add-btn {
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 6px;
-  background: white;
-  color: var(--color-primary);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
   flex-shrink: 0;
 }
 
 .add-btn .mdi {
   font-size: 24px;
-}
-
-.add-btn:hover {
-  background: #e6e6e6;
 }
 
 .content {
@@ -108,6 +95,8 @@ import { onMounted, ref } from 'vue';
 import { useRecipeStore } from './stores/recipeStore.js';
 import RecipeList from './components/RecipeList.vue';
 import RecipeModal from './components/RecipeModal.vue';
+import BaseButton from './components/ui/BaseButton.vue';
+import BaseInput from './components/ui/BaseInput.vue';
 
 const store = useRecipeStore();
 const modalOpen = ref(false);
