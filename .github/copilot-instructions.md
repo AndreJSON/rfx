@@ -52,3 +52,5 @@ npm start            # starts the Node server on port 8080
 - Use `async/await` throughout; no raw callback patterns.
 - Pinia stores are the single source of truth for frontend state — no ad-hoc local reactive state for recipe data.
 - Radix UI primitives are used for all interactive components (Dialog, Tooltip, etc.); avoid custom re-implementations.
+- All vue files should use `<script setup>` syntax and Composition API.
+- All vue files should have html first, then style, then script.

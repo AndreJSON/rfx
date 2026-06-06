@@ -112,13 +112,13 @@ function handleTagKeydown(e) {
 }
 
 function handleTagInput(e) {
-  // Strip whitespace as user types
-  e.target.value = e.target.value.replace(/\s/g, '');
+  // Strip whitespace and enforce uppercase as user types
+  e.target.value = e.target.value.replace(/\s/g, '').toUpperCase();
   tagInput.value = e.target.value;
 }
 
 function commitTag() {
-  const tag = tagInput.value.trim();
+  const tag = tagInput.value.trim().toUpperCase();
   if (tag && /^\S+$/.test(tag) && !editTags.value.includes(tag)) {
     editTags.value.push(tag);
   }
@@ -315,14 +315,6 @@ async function handleDelete() {
                   @input="handleTitleInput"
                 />
 
-                <label class="field-label">Body</label>
-                <textarea
-                  v-model="editBody"
-                  class="field-textarea"
-                  rows="6"
-                  placeholder="Recipe instructions…"
-                />
-
                 <label class="field-label">Tags</label>
                 <div class="tags-edit">
                   <span
@@ -345,6 +337,14 @@ async function handleDelete() {
                     @blur="commitTag"
                   />
                 </div>
+
+                <label class="field-label">Body</label>
+                <textarea
+                  v-model="editBody"
+                  class="field-textarea"
+                  rows="6"
+                  placeholder="Recipe instructions…"
+                />
 
                 <label class="field-label">Image</label>
                 <div v-if="displayImageUrl" class="image-edit-row">

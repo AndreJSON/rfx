@@ -52,6 +52,7 @@ applyTo: "client/**"
 - Editable fields: title (input), body (textarea), tags (add/remove chips), image (upload or remove).
 - Title field must reject newlines (strip on input or prevent via keydown).
 - Tag input must reject whitespace (validate before adding tag).
+- Tag input should always uppercase tags on input.
 - Image: show current image with a remove button; show upload control when no image is present.
 - See [image.instructions.md](image.instructions.md) for full image upload/remove behaviour.
 - Save action calls the Pinia store method which calls the API.
