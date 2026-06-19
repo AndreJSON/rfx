@@ -45,10 +45,11 @@
   font-weight: 700;
   color: #444;
   margin: 4px 0;
-  padding: 8px 12px;
-  background-color: #f5f5f5;
-  border-bottom: 2px solid #81c784;
-  z-index: 10;
+  position: sticky;
+  top: 0;
+  background: rgba(129, 199, 132, 0.08);
+  padding: 8px 0;
+  z-index: 5;
 }
 
 .empty-state {
