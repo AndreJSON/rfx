@@ -4,17 +4,24 @@
       <template v-if="store.searchQuery">No recipes match your search.</template>
       <template v-else>No recipes yet. Click the add button to create one.</template>
     </div>
-    <BaseButton
-      v-for="recipe in filtered"
-      :key="recipe.id"
-      variant="card"
-      size="lg"
-      class="recipe-card"
-      @click="emit('open-recipe', recipe.id)"
+    <section
+      v-for="section in recipesBySection"
+      :key="section.label"
+      class="recipe-section"
     >
-      <span class="recipe-title">{{ recipe.title }}</span>
-      <span class="recipe-tags">{{ recipe.tags.join(', ') }}</span>
-    </BaseButton>
+      <h2 class="section-title">{{ section.label }}</h2>
+      <BaseButton
+        v-for="recipe in section.recipes"
+        :key="`${section.label}-${recipe.id}`"
+        variant="card"
+        size="lg"
+        class="recipe-card"
+        @click="emit('open-recipe', recipe.id)"
+      >
+        <span class="recipe-title">{{ recipe.title }}</span>
+        <span class="recipe-tags">{{ recipe.tags.join(', ') }}</span>
+      </BaseButton>
+    </section>
   </div>
 </template>
 
@@ -22,7 +29,20 @@
 .recipe-list {
   display: flex;
   flex-direction: column;
+  gap: 14px;
+}
+
+.recipe-section {
+  display: flex;
+  flex-direction: column;
   gap: 5px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #444;
+  margin: 4px 0;
 }
 
 .empty-state {
@@ -57,6 +77,12 @@ import BaseButton from './ui/BaseButton.vue';
 
 const emit = defineEmits(['open-recipe']);
 const store = useRecipeStore();
+const SECTIONS = [
+  { label: 'Varmrätt', tag: 'varmrätt' },
+  { label: 'Efterrätt', tag: 'efterrätt' },
+  { label: 'Bakat', tag: 'bakat' },
+];
+const OTHER_SECTION_LABEL = 'Övrigt';
 
 const filtered = computed(() => {
   const q = store.searchQuery.toLowerCase().trim();
@@ -65,5 +91,34 @@ const filtered = computed(() => {
     r.title.toLowerCase().includes(q) ||
     r.tags.some(t => t.toLowerCase().includes(q))
   );
+});
+
+const recipesBySection = computed(() => {
+  const sectionMap = new Map(SECTIONS.map(section => [section.label, []]));
+  const otherRecipes = [];
+
+  for (const recipe of filtered.value) {
+    const recipeTags = new Set(recipe.tags.map(tag => tag.toLowerCase()));
+    let appearsInAnySection = false;
+
+    for (const section of SECTIONS) {
+      if (recipeTags.has(section.tag)) {
+        sectionMap.get(section.label).push(recipe);
+        appearsInAnySection = true;
+      }
+    }
+
+    if (!appearsInAnySection) {
+      otherRecipes.push(recipe);
+    }
+  }
+
+  return [
+    ...SECTIONS.map(section => ({
+      label: section.label,
+      recipes: sectionMap.get(section.label),
+    })),
+    { label: OTHER_SECTION_LABEL, recipes: otherRecipes },
+  ];
 });
 </script>
