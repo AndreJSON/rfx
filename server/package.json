@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "import:backup": "node scripts/import-backup.js"
   },
   "dependencies": {
     "express": "^5.2.1",
