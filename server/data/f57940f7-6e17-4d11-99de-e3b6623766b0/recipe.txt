@@ -1,6 +1,0 @@
-TITLE: Test recipe
-CREATED: 2026-06-06T19:45:47.932Z
-UPDATED: 2026-06-06T21:01:52.033Z
-DELETED: 
-TAGS: with,an,image
-BODY: And some text
