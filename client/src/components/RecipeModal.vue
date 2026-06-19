@@ -526,6 +526,7 @@ async function handleImageFileSelect(e) {
 }
 
 async function handleImageRemove() {
+  if (!confirm('Remove this image?')) return;
   if (mode.value === 'create') {
     clearPendingImage();
     return;
