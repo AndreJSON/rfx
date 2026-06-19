@@ -43,6 +43,11 @@
   font-weight: 700;
   color: #444;
   margin: 4px 0;
+  position: sticky;
+  top: 0;
+  background: rgba(129, 199, 132, 0.08);
+  padding: 8px 0;
+  z-index: 5;
 }
 
 .empty-state {
