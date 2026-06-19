@@ -1,8 +1,8 @@
 TITLE: Enkel Mangosorbet med topping
 CREATED: 2020-10-10T20:24:35.000Z
-UPDATED: 2020-10-10T20:24:35.000Z
+UPDATED: 2026-06-19T20:52:32.840Z
 DELETED: 
-TAGS: EFTERRÄTT
+TAGS: SÖTT
 BODY: 500 g frusen mango
 1/2 dl pressad lime
 1/2 dl pressad apelsin

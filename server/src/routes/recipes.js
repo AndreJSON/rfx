@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
       }
     }
 
-    results.sort((a, b) => new Date(a._created) - new Date(b._created));
+    results.sort((a, b) => a.title.localeCompare(b.title));
     res.json(results.map(({ id, title, tags }) => ({ id, title, tags })));
   } catch (err) {
     console.error(err);

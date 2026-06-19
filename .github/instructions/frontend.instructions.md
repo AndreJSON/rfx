@@ -35,8 +35,8 @@ applyTo: "client/**"
 
 ## Recipe List
 
-- The recipe list is grouped into labeled sections in this exact order: **Varmrätt**, **Tillbehör**, **Smårätt**, **Sött**, **Bakat**, **Övrigt**.
-- A recipe appears in **Varmrätt**, **Tillbehör**, **Smårätt**, **Sött**, and/or **Bakat** when it has the corresponding tag, and it may appear in multiple of these sections.
+- The recipe list is grouped into labeled sections in this exact order: **Varmrätt**, **Tillbehör**, **Smårätt**, **Sött**, **Bakat**, **Frukost**, **Dryck**, **Övrigt**.
+- A recipe appears in **Varmrätt**, **Tillbehör**, **Smårätt**, **Sött**, **Bakat**, **Frukost**, and/or **Dryck** when it has the corresponding tag, and it may appear in multiple of these sections.
 - **Övrigt** must appear last and contains recipes that do not belong to at least one of the previous sections.
 - Each list item displays two lines: **title** (line 1) and comma-separated tags (line 2).
 - Clicking a list item opens the **Recipe Modal** in view mode.

@@ -1,8 +1,8 @@
 TITLE: Gluhwein
 CREATED: 2021-01-06T20:09:14.000Z
-UPDATED: 2021-02-06T10:03:07.000Z
+UPDATED: 2026-06-19T20:46:46.464Z
 DELETED: 
-TAGS: 
+TAGS: DRYCK
 BODY: 75	cl	rödvin
 5	st	hela nejlikor
 3	st	frökapslar från stjärnanis

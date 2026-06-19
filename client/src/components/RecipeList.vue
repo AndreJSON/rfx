@@ -40,15 +40,14 @@
 
 .section-title {
   position: sticky;
-  top: 0;
+  top: 63px;
   font-size: 15px;
   font-weight: 700;
   color: #444;
   margin: 4px 0;
-  position: sticky;
-  top: 0;
-  background: rgba(129, 199, 132, 0.08);
-  padding: 8px 0;
+  background: var(--color-primary);
+  padding: 12px 12px;
+  border-radius: 8px;
   z-index: 5;
 }
 
@@ -90,6 +89,8 @@ const SECTIONS = [
   { label: 'Smårätt', tag: 'smårätt' },
   { label: 'Sött', tag: 'sött' },
   { label: 'Bakat', tag: 'bakat' },
+  { label: 'Frukost', tag: 'frukost' },
+  { label: 'Dryck', tag: 'dryck' },
 ];
 const OTHER_SECTION_LABEL = 'Övrigt';
 

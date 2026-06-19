@@ -1,8 +1,8 @@
 TITLE: Bröd i stekpanna
 CREATED: 2019-07-11T19:30:27.000Z
-UPDATED: 2019-07-11T19:30:27.000Z
+UPDATED: 2026-06-19T20:44:53.002Z
 DELETED: 
-TAGS: TORTILLA,PITA
+TAGS: TORTILLA,PITA,BAKAT
 BODY: 4 bröd (hälften så stora som köptortillas, men tjockare)
 
 100g mjöl
