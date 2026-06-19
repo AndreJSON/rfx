@@ -39,10 +39,16 @@
 }
 
 .section-title {
+  position: sticky;
+  top: 0;
   font-size: 15px;
   font-weight: 700;
   color: #444;
   margin: 4px 0;
+  padding: 8px 12px;
+  background-color: #f5f5f5;
+  border-bottom: 2px solid #81c784;
+  z-index: 10;
 }
 
 .empty-state {
@@ -79,7 +85,9 @@ const emit = defineEmits(['open-recipe']);
 const store = useRecipeStore();
 const SECTIONS = [
   { label: 'Varmrätt', tag: 'varmrätt' },
-  { label: 'Efterrätt', tag: 'efterrätt' },
+  { label: 'Tillbehör', tag: 'tillbehör' },
+  { label: 'Smårätt', tag: 'smårätt' },
+  { label: 'Sött', tag: 'sött' },
   { label: 'Bakat', tag: 'bakat' },
 ];
 const OTHER_SECTION_LABEL = 'Övrigt';
