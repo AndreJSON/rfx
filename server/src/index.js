@@ -13,12 +13,16 @@ app.use('/api', (req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
 
-if (process.env.NODE_ENV === 'production') {
+const env = process.argv[2];
+
+if (env === 'prod') {
+  console.log('Running in production mode');
   app.use(express.static(CLIENT_DIST));
   app.use((req, res) => {
     res.sendFile(join(CLIENT_DIST, 'index.html'));
   });
 } else {
+  console.log('Running in development mode');
   app.use((req, res) => {
     res.redirect(`http://localhost:5173${req.originalUrl}`);
   });
