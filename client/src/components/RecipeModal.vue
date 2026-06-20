@@ -30,7 +30,14 @@
               </div>
               <div v-if="recipe.body" class="body-text">{{ recipe.body }}</div>
               <div v-if="displayImageUrl" class="image-section">
-                <img :src="displayImageUrl" class="recipe-image" alt="Recipe image" />
+                <button
+                  type="button"
+                  class="image-toggle"
+                  aria-label="View image fullscreen"
+                  @click="toggleImageExpanded"
+                >
+                  <img :src="displayImageUrl" class="recipe-image" alt="Recipe image" />
+                </button>
               </div>
               <div v-if="error" class="error-msg">{{ error }}</div>
             </div>
@@ -141,6 +148,21 @@
       </DialogContent>
     </DialogPortal>
   </DialogRoot>
+  <DialogRoot :open="imageExpanded" @update:open="handleImageExpandedOpenChange">
+    <DialogPortal>
+      <DialogOverlay class="image-overlay" />
+      <DialogContent class="image-modal" aria-describedby="undefined">
+        <button
+          type="button"
+          class="image-fullscreen-button"
+          aria-label="Exit fullscreen image"
+          @click="closeImageExpanded"
+        >
+          <img :src="displayImageUrl" class="recipe-image-fullscreen" alt="Recipe image" />
+        </button>
+      </DialogContent>
+    </DialogPortal>
+  </DialogRoot>
 </template>
 
 <style scoped>
@@ -236,11 +258,60 @@
   margin-bottom: 14px;
 }
 
-.recipe-image {
-  max-width: 100%;
-  max-height: 320px;
-  object-fit: contain;
+.image-toggle {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
   border-radius: 6px;
+  cursor: zoom-in;
+}
+
+.recipe-image {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+}
+
+.image-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 102;
+}
+
+.image-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 103;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: transparent;
+  outline: none;
+}
+
+.image-fullscreen-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-out;
+}
+
+.recipe-image-fullscreen {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   display: block;
 }
 
@@ -385,6 +456,7 @@ const fileInputRef = ref(null);
 const imageTimestamp = ref(Date.now()); // cache-busting for API images
 const pendingImageFile = ref(null);     // File selected in create mode (uploaded on save)
 const pendingImagePreviewUrl = ref(null); // blob URL for create-mode preview
+const imageExpanded = ref(false);
 
 // --- Computed ---
 
@@ -402,7 +474,10 @@ const displayImageUrl = computed(() => {
 // --- Watchers ---
 
 watch(() => props.open, async (open) => {
-  if (!open) return;
+  if (!open) {
+    closeImageExpanded();
+    return;
+  }
   error.value = null;
   clearPendingImage();
   if (props.recipeId === null) {
@@ -412,6 +487,18 @@ watch(() => props.open, async (open) => {
   } else {
     mode.value = 'view';
     await loadRecipe(props.recipeId);
+  }
+});
+
+watch(mode, (nextMode) => {
+  if (nextMode !== 'view') {
+    closeImageExpanded();
+  }
+});
+
+watch(displayImageUrl, (nextImageUrl) => {
+  if (!nextImageUrl) {
+    closeImageExpanded();
   }
 });
 
@@ -459,6 +546,18 @@ function openFilePicker() {
     fileInputRef.value.value = '';
     fileInputRef.value.click();
   }
+}
+
+function toggleImageExpanded() {
+  imageExpanded.value = !imageExpanded.value;
+}
+
+function closeImageExpanded() {
+  imageExpanded.value = false;
+}
+
+function handleImageExpandedOpenChange(open) {
+  imageExpanded.value = open;
 }
 
 // --- Tag input ---
